@@ -44,15 +44,11 @@ function FindProxyForURL(url, host) {
     var blockDomainList = [
         "google.com",
         "facebook.com",
-        "youtube.com"
+        "youtube.com",
+		"dell.com",
+		"hp.com"
     ];
 
-    var blockUrlList = [
-        "https://www.dell.com/zh-hk",
-        "https://www.hp.com/hk-zh/home.html"
-    ];
-
-    var k;
 
     /* Domain-level block: domain plus all subdomains */
     for (k = 0; k < blockDomainList.length; k++) {
@@ -61,17 +57,6 @@ function FindProxyForURL(url, host) {
             return drop;
         }
     }
-
-    /*
-     * URL-level block.
-     * Suitable mainly for HTTP. See HTTPS limitation below.
-     */
-    for (k = 0; k < blockUrlList.length; k++) {
-        if (shExpMatch(url, blockUrlList[k])) {
-            return drop;
-        }
-    }
-
 
 
     /* Custom whitelist */
