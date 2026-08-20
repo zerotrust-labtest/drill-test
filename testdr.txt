@@ -48,8 +48,8 @@ function FindProxyForURL(url, host) {
     ];
 
     var blockUrlList = [
-        "http://example.com/blocked/*",
-        "https://example.com/blocked/*"
+        "https://www.dell.com/zh-hk",
+        "https://www.hp.com/hk-zh/home.html"
     ];
 
     var k;
