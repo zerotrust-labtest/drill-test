@@ -40,7 +40,7 @@ function FindProxyForURL(url, host) {
      * 127.0.0.1:9 is deliberately unreachable.
      */
     var blockProxy = "PROXY 127.0.0.1:9";
-
+    var drop = "BLOCK";
     var blockDomainList = [
         "google.com",
         "facebook.com",
@@ -58,7 +58,7 @@ function FindProxyForURL(url, host) {
     for (k = 0; k < blockDomainList.length; k++) {
         if (host === blockDomainList[k] ||
             shExpMatch(host, "*." + blockDomainList[k])) {
-            return "BLOCK";
+            return drop;
         }
     }
 
@@ -68,7 +68,7 @@ function FindProxyForURL(url, host) {
      */
     for (k = 0; k < blockUrlList.length; k++) {
         if (shExpMatch(url, blockUrlList[k])) {
-            return "BLOCK";
+            return drop;
         }
     }
 
