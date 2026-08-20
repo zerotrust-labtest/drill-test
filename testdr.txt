@@ -58,7 +58,7 @@ function FindProxyForURL(url, host) {
     for (k = 0; k < blockDomainList.length; k++) {
         if (host === blockDomainList[k] ||
             shExpMatch(host, "*." + blockDomainList[k])) {
-            return blockProxy;
+            return "BLOCK";
         }
     }
 
@@ -68,7 +68,7 @@ function FindProxyForURL(url, host) {
      */
     for (k = 0; k < blockUrlList.length; k++) {
         if (shExpMatch(url, blockUrlList[k])) {
-            return blockProxy;
+            return "BLOCK";
         }
     }
 
