@@ -37,10 +37,19 @@ function FindProxyForURL(url, host) {
  /*
      * DR block list
      * Do NOT append "; DIRECT".
-     * 127.0.0.1:9 is deliberately unreachable.
      */
-    var blockProxy = "PROXY 127.0.0.1:9";
-    var drop = "BLOCK";
+var drop = "BLOCK";
+
+var blockUrlList = [
+    "https://www.bbc.com/news/articles/cqx2zpj4y525o",
+];
+
+/* Specific URL/path block must be evaluated before DIRECT whitelist rules */
+for (var u = 0; u < blockUrlList.length; u++) {
+    if (shExpMatch(url, blockUrlList[u])) {
+        return drop;
+    }
+}
     var blockDomainList = [
         "google.com",
         "facebook.com",
@@ -48,7 +57,6 @@ function FindProxyForURL(url, host) {
 		"dell.com",
 		"hp.com"
     ];
-
 
     /* Domain-level block: domain plus all subdomains */
     for (k = 0; k < blockDomainList.length; k++) {
