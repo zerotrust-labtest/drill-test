@@ -1,57 +1,40 @@
 function FindProxyForURL(url, host) {
-    var privateIP = /^(0|10|127|192\.168|172\.1[6-9]|172\.2[0-9]|172\.3[0-1]|169\.254|192\.88\.99)\.[0-9.]+$/;
-
-    host = host.toLowerCase();
-
-    if (host.charAt(host.length - 1) == ".") {
-        host = host.substring(0, host.length - 1);
-    }
-
+    var privateIP = /^(0|10|127|192\.168|172\.1[6789]|172\.2[0-9]|172\.3[01]|169\.254|192\.88\.99)\.[0-9.]+$/;
     var resolved_ip = dnsResolve(host);
 
-    /* Non-FQDN and private destinations */
-    if (
-        isPlainHostName(host) ||
-        (
-            resolved_ip &&
-            (
-                isInNet(resolved_ip, "192.0.2.0", "255.255.255.0") ||
-                privateIP.test(resolved_ip)
-            )
-        )
-    ) {
+    /* Don't send non-FQDN or private IP hosts to us */
+    if (isPlainHostName(host) || 
+        isInNet(resolved_ip, "192.0.2.0","255.255.255.0") || 
+        privateIP.test(resolved_ip))
         return "DIRECT";
-    }
 
-    /* FTP destinations */
-    if (url.substring(0, 4) == "ftp:") {
+    /* FTP goes directly */
+    if (url.substring(0,4) == "ftp:")
         return "DIRECT";
-    }
 
-    /* Zscaler trust / update destinations */
-    if (
-        localHostOrDomainIs(host, "trust.zscaler.com") ||
-        localHostOrDomainIs(host, "trust.zscaler.net") ||
-        localHostOrDomainIs(host, "trust.zscalerone.net") ||
-        localHostOrDomainIs(host, "trust.zscalertwo.net") ||
-        localHostOrDomainIs(host, "trust.zscalerthree.net") ||
-        localHostOrDomainIs(host, "trust.zscalergov.net") ||
-        localHostOrDomainIs(host, "trust.zsdemo.net") ||
-        localHostOrDomainIs(host, "trust.zscloud.net") ||
-        localHostOrDomainIs(host, "trust.zsfalcon.net") ||
-        localHostOrDomainIs(host, "trust.zdxcloud.net") ||
-        localHostOrDomainIs(host, "trust.zdxpreview.net") ||
-        localHostOrDomainIs(host, "trust.zdxbeta.net") ||
-        localHostOrDomainIs(host, "trust.zsdevel.net") ||
-        localHostOrDomainIs(host, "trust.zsbetagov.net") ||
-        localHostOrDomainIs(host, "trust.zspreview.net") ||
-        localHostOrDomainIs(host, "trust.zscalerten.net") ||
-        localHostOrDomainIs(host, "trust.zdxten.net")
-    ) {
+    /* Updates are directly accessible */
+
+	if (((localHostOrDomainIs(host, "trust.zscaler.com")) ||
+            (localHostOrDomainIs(host, "trust.zscaler.net")) ||
+            (localHostOrDomainIs(host, "trust.zscalerone.net")) ||
+            (localHostOrDomainIs(host, "trust.zscalertwo.net")) ||
+            (localHostOrDomainIs(host, "trust.zscalerthree.net")) ||
+            (localHostOrDomainIs(host, "trust.zscalergov.net")) ||
+            (localHostOrDomainIs(host, "trust.zsdemo.net")) ||
+            (localHostOrDomainIs(host, "trust.zscloud.net")) ||
+            (localHostOrDomainIs(host, "trust.zsfalcon.net")) ||
+            (localHostOrDomainIs(host, "trust.zdxcloud.net")) ||
+            (localHostOrDomainIs(host, "trust.zdxpreview.net")) ||
+            (localHostOrDomainIs(host, "trust.zdxbeta.net")) ||
+            (localHostOrDomainIs(host, "trust.zsdevel.net")) ||
+            (localHostOrDomainIs(host, "trust.zsbetagov.net")) ||
+	    (localHostOrDomainIs(host, "trust.zspreview.net")) ||
+	    (localHostOrDomainIs(host, "trust.zscalerten.net")) || 
+	    (localHostOrDomainIs(host, "trust.zdxten.net")) ) &&
+            (url.substring(0,5) == "http:" || url.substring(0,6) == "https:"))
         return "DIRECT";
-    }
 
-    /* Additional IP destinations to allow during DR */
+    /* Custom whitelist */
     var ipList = [
         {ip: "101.78.206.250", mask: "255.255.255.255"},
         {ip: "218.188.80.86", mask: "255.255.255.255"},
@@ -60,62 +43,28 @@ function FindProxyForURL(url, host) {
         {ip: "100.64.0.0", mask: "255.255.0.0"}
     ];
 
-    for (var i = 0; i < ipList.length; i++) {
-        if (
-            resolved_ip &&
-            isInNet(resolved_ip, ipList[i].ip, ipList[i].mask)
-        ) {
-            return "DIRECT";
-        }
-    }
-
-    /* Additional FQDN/domain destinations to allow during DR */
     var domainList = [
-        "esh.hk",
-        "akadns.net",
-        "adfs.hkjc.org.hk",
-        "zoom.us",
-        "qcew.com",
-        "cuww.com",
-        "hkjc.com",
-        "iuww.com",
-        "hkjc.org.cn",
-        "beijingclubhouse.com",
-        "hkjcracing.com",
-        "hkjcfootball.com",
-        "citiesphilanthropy.com",
-        "hkjcequinewelfare.org.hk",
-        "cbs-measurements.qwilted-cds.cqloud.com",
-        "icrav.com",
-        "dmzcorp.hkjc.org.hk",
-        "bochk.com",
-        "ftcwifi.com",
-        "conferdeploy.net",
-        "wcmhkjc.com",
-        "edm-mem.hkjc.com",
-        "vic.cichk.com",
-        "gateway-hkjc.goskope.com",
-        "gateway-backup-hkjc.goskope.com",
-        "download-hkjc.goskope.com",
-        "achecker-hkjc.goskope.com",
-        "hkjc.goskope.com",
-        "alicdn.com",
-        "youku.com",
-        "eclick.baidu.com",
-        "qbww.com"
+        "esh.hk", "akadns.net", "adfs.hkjc.org.hk", "zoom.us", "qcew.com", "cuww.com",
+        "hkjc.com", "iuww.com", "hkjc.org.cn", "beijingclubhouse.com", "hkjcracing.com",
+        "hkjcfootball.com", "citiesphilanthropy.com", "hkjcequinewelfare.org.hk",
+        "cbs-measurements.qwilted-cds.cqloud.com", "icrav.com",
+        "dmzcorp.hkjc.org.hk", "bochk.com", "ftcwifi.com", "conferdeploy.net",
+        "carbonblack.io", "wcmhkjc.com", "edm-mem.hkjc.com", "vic.cichk.com",
+        "gateway-hkjc.goskope.com", "gateway-backup-hkjc.goskope.com",
+        "download-hkjc.goskope.com", "achecker-hkjc.goskope.com", "hkjc.goskope.com",
+        "alicdn.com", "youku.com", "eclick.baidu.com", "qbww.com"
     ];
 
-    for (var j = 0; j < domainList.length; j++) {
-        if (
-            host === domainList[j] ||
-            shExpMatch(host, "*." + domainList[j])
-        ) {
+    for (var i = 0; i < ipList.length; i++) {
+        if (isInNet(host, ipList[i].ip, ipList[i].mask)) {
             return "DIRECT";
         }
     }
 
-    /*
-     * Intentionally no final return:
-     * unmatched traffic is evaluated by ZIA DR Pre-Selected Destinations.
-     */
+    for (var j = 0; j < domainList.length; j++) {
+        if (shExpMatch(host, "*." + domainList[j]) || host === domainList[j]) {
+            return "DIRECT";
+        }
+    }
+
 }
