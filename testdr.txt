@@ -38,14 +38,19 @@ function FindProxyForURL(url, host) {
      * DR block list
      * Do NOT append "; DIRECT".
      */
-var drop = "BLOCK";
+    var drop = "BLOCK";
     var blockDomainList = [
-        "google.com",
-        "facebook.com",
-        "youtube.com",
-		"dell.com",
-		"hp.com"
+        "cdc-file-storage-production-us-east-1.s3.amazonaws.comm",
+        "content.carbonblack.io",
+        "defense-cblr-file-uploads-us-east-1.s3.amazonaws.com",
+	"defense-prod05.conferdeploy.net",
+	"dev-prod05.conferdeploy.net",
+	"ent-shasta-rrs.symantec.com",
+	"liveupdate.symantec.com",
+	"updates2.cdc.carbonblack.io",
+	"bbc.com"
     ];
+
 
     /* Domain-level block: domain plus all subdomains */
     for (k = 0; k < blockDomainList.length; k++) {
