@@ -3,8 +3,8 @@ var drop = "BLOCK";
 /* Return DIRECT to Allow access */
 if ((localHostOrDomainIs(host, "hkjc.com")) ||
 (localHostOrDomainIs(host, "www.gamer.com.tw")) ||
-(localHostOrDomainIs(host, "microsoft.com")) ||
-(localHostOrDomainIs(host, "zscaler.com")) )
+(localHostOrDomainIs(host, "youku.com")) ||
+(localHostOrDomainIs(host, "baidu.com")) )
 return "DIRECT";
 /* Default Block Statement to block anything not allowed above */
 }
