@@ -34,15 +34,15 @@ function FindProxyForURL(url, host) {
             (url.substring(0,5) == "http:" || url.substring(0,6) == "https:"))
         return "DIRECT";
 
-   var blockDomainList = [
+   var blocklist = [
 	"ent-shasta-rrs.symantec.com", "liveupdate.symantec.com", "shasta-clt.symantec.com", "updates2.cdc.carbonblack.io", "bbc.com"
     ];
 
-    for (var k = 0; k < blockDomainList.length; k++) {
-        if (shExpMatch(host, "*." + blockDomainList[k]) || host === blockDomainList[k]) {
+    for (var k = 0; k < blocklist.length; k++) {
+        if (shExpMatch(host, "*." + blocklist[k]) || host === blocklist[k]) {
             return drop;
-
-
+        }
+    }
     /* Custom whitelist */
     var ipList = [
         {ip: "101.78.206.250", mask: "255.255.255.255"},
@@ -76,14 +76,5 @@ function FindProxyForURL(url, host) {
         }
     }
 
-    var blockDomainList = [
-	"ent-shasta-rrs.symantec.com", "liveupdate.symantec.com", "shasta-clt.symantec.com", "updates2.cdc.carbonblack.io", "bbc.com"
-    ];
-
-    for (var k = 0; k < blockDomainList.length; k++) {
-        if (shExpMatch(host, "*." + blockDomainList[k]) || host === blockDomainList[k]) {
-            return drop;
-        }
-    }
 
 }
