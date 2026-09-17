@@ -1,7 +1,7 @@
 function FindProxyForURL(url, host) {
     var privateIP = /^(0|10|127|192\.168|172\.1[6789]|172\.2[0-9]|172\.3[01]|169\.254|192\.88\.99)\.[0-9.]+$/;
     var resolved_ip = dnsResolve(host);
-
+	var drop = "BLOCK";
     /* Don't send non-FQDN or private IP hosts to us */
     if (isPlainHostName(host) || 
         isInNet(resolved_ip, "192.0.2.0","255.255.255.0") || 
@@ -64,6 +64,17 @@ function FindProxyForURL(url, host) {
     for (var j = 0; j < domainList.length; j++) {
         if (shExpMatch(host, "*." + domainList[j]) || host === domainList[j]) {
             return "DIRECT";
+        }
+    }
+
+    var blockDomainList = [
+	"ent-shasta-rrs.symantec.com", "liveupdate.symantec.com", "shasta-clt.symantec.com", "updates2.cdc.carbonblack.io", "bbc.com"
+    ];
+
+    /* Domain-level block: domain plus all subdomains */
+    for (k = 0; k < blockDomainList.length; k++) {
+        if (shExpMatch(host, "*." + blockDomainList[k]) || host === blockDomainList[k]) {
+            return drop;
         }
     }
 
