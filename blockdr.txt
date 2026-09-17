@@ -71,8 +71,7 @@ function FindProxyForURL(url, host) {
 	"ent-shasta-rrs.symantec.com", "liveupdate.symantec.com", "shasta-clt.symantec.com", "updates2.cdc.carbonblack.io", "bbc.com"
     ];
 
-    /* Domain-level block: domain plus all subdomains */
-    for (k = 0; k < blockDomainList.length; k++) {
+    for (var k = 0; k < blockDomainList.length; k++) {
         if (shExpMatch(host, "*." + blockDomainList[k]) || host === blockDomainList[k]) {
             return drop;
         }
