@@ -156,24 +156,6 @@ function FindProxyForURL(url, host) {
         }
     }
 
-var blockDomainList = [
-        "ent-shasta-rrs.symantec.com",
-        "liveupdate.symantec.com",
-        "shasta-clt.symantec.com",
-        "updates2.cdc.carbonblack.io",
-        "bbc.com",
-        "hp.com"
-    ];
-
-    for (var k = 0; k < blockDomainList.length; k++) {
-        if (
-            host === blockDomainList[k] ||
-            shExpMatch(host, "*." + blockDomainList[k])
-        ) {
-            return drop;
-        }
-    }
-
     /*
      * Intentionally no final "return BLOCK".
      *
