@@ -1,0 +1,182 @@
+function FindProxyForURL(url, host) {
+    /*
+     * ZIA DR Custom Destinations PAC
+     *
+     * Processing order:
+     * 1. Private/non-FQDN/Zscaler trust endpoints -> DIRECT
+     * 2. Explicit custom block destinations -> BLOCK
+     * 3. Additional custom business destinations -> DIRECT
+     * 4. No custom PAC result -> use ZIA DR Pre-Selected Destinations
+     */
+
+    host = host.toLowerCase();
+
+    /* Normalize FQDNs with a trailing dot */
+    if (host.charAt(host.length - 1) == ".") {
+        host = host.substring(0, host.length - 1);
+    }
+
+    var privateIP = /^(0|10|127|192\.168|172\.1[6-9]|172\.2[0-9]|172\.3[0-1]|169\.254|192\.88\.99)\.[0-9.]+$/;
+    var resolved_ip = dnsResolve(host);
+
+    /*
+     * Don't send non-FQDN or private destinations to ZIA.
+     * Guard resolved_ip because dnsResolve() can return null.
+     */
+    if (
+        isPlainHostName(host) ||
+        (
+            resolved_ip &&
+            (
+                isInNet(resolved_ip, "192.0.2.0", "255.255.255.0") ||
+                privateIP.test(resolved_ip)
+            )
+        )
+    ) {
+        return "DIRECT";
+    }
+
+    /* FTP goes directly */
+    if (url.substring(0, 4) == "ftp:") {
+        return "DIRECT";
+    }
+
+    /*
+     * Zscaler trust / update destinations must remain accessible
+     * during DR mode.
+     */
+    if (
+        (
+            localHostOrDomainIs(host, "trust.zscaler.com") ||
+            localHostOrDomainIs(host, "trust.zscaler.net") ||
+            localHostOrDomainIs(host, "trust.zscalerone.net") ||
+            localHostOrDomainIs(host, "trust.zscalertwo.net") ||
+            localHostOrDomainIs(host, "trust.zscalerthree.net") ||
+            localHostOrDomainIs(host, "trust.zscalergov.net") ||
+            localHostOrDomainIs(host, "trust.zsdemo.net") ||
+            localHostOrDomainIs(host, "trust.zscloud.net") ||
+            localHostOrDomainIs(host, "trust.zsfalcon.net") ||
+            localHostOrDomainIs(host, "trust.zdxcloud.net") ||
+            localHostOrDomainIs(host, "trust.zdxpreview.net") ||
+            localHostOrDomainIs(host, "trust.zdxbeta.net") ||
+            localHostOrDomainIs(host, "trust.zsdevel.net") ||
+            localHostOrDomainIs(host, "trust.zsbetagov.net") ||
+            localHostOrDomainIs(host, "trust.zspreview.net") ||
+            localHostOrDomainIs(host, "trust.zscalerten.net") ||
+            localHostOrDomainIs(host, "trust.zdxten.net")
+        ) &&
+        (
+            url.substring(0, 5) == "http:" ||
+            url.substring(0, 6) == "https:"
+        )
+    ) {
+        return "DIRECT";
+    }
+
+    /*
+     * Explicit custom block list.
+     *
+     * This is evaluated before the custom whitelist deliberately.
+     * Therefore, a blocked FQDN remains blocked even if its parent
+     * domain appears in domainList.
+     */
+    var drop = "BLOCK";
+
+    var blockDomainList = [
+        "ent-shasta-rrs.symantec.com",
+        "liveupdate.symantec.com",
+        "shasta-clt.symantec.com",
+        "updates2.cdc.carbonblack.io",
+        "bbc.com"
+    ];
+
+    for (var k = 0; k < blockDomainList.length; k++) {
+        if (
+            host === blockDomainList[k] ||
+            shExpMatch(host, "*." + blockDomainList[k])
+        ) {
+            return drop;
+        }
+    }
+
+    /*
+     * Additional custom DR IP allowlist.
+     *
+     * Use resolved_ip instead of host. host is normally an FQDN,
+     * while resolved_ip is the result of dnsResolve(host).
+     */
+    var ipList = [
+        {ip: "101.78.206.250", mask: "255.255.255.255"},
+        {ip: "218.188.80.86", mask: "255.255.255.255"},
+        {ip: "202.127.168.61", mask: "255.255.255.255"},
+        {ip: "202.127.170.148", mask: "255.255.255.255"},
+        {ip: "100.64.0.0", mask: "255.255.0.0"}
+    ];
+
+    for (var i = 0; i < ipList.length; i++) {
+        if (
+            resolved_ip &&
+            isInNet(resolved_ip, ipList[i].ip, ipList[i].mask)
+        ) {
+            return "DIRECT";
+        }
+    }
+
+    /*
+     * Additional custom DR domain allowlist.
+     *
+     * Every item matches:
+     * - exact apex domain, e.g. hkjc.com
+     * - all subdomains, e.g. www.hkjc.com, login.hkjc.com
+     */
+    var domainList = [
+        "esh.hk",
+        "akadns.net",
+        "adfs.hkjc.org.hk",
+        "zoom.us",
+        "qcew.com",
+        "cuww.com",
+        "hkjc.com",
+        "iuww.com",
+        "hkjc.org.cn",
+        "beijingclubhouse.com",
+        "hkjcracing.com",
+        "hkjcfootball.com",
+        "citiesphilanthropy.com",
+        "hkjcequinewelfare.org.hk",
+        "cbs-measurements.qwilted-cds.cqloud.com",
+        "icrav.com",
+        "dmzcorp.hkjc.org.hk",
+        "bochk.com",
+        "ftcwifi.com",
+        "conferdeploy.net",
+        "wcmhkjc.com",
+        "edm-mem.hkjc.com",
+        "vic.cichk.com",
+        "gateway-hkjc.goskope.com",
+        "gateway-backup-hkjc.goskope.com",
+        "download-hkjc.goskope.com",
+        "achecker-hkjc.goskope.com",
+        "hkjc.goskope.com",
+        "alicdn.com",
+        "youku.com",
+        "eclick.baidu.com",
+        "qbww.com"
+    ];
+
+    for (var j = 0; j < domainList.length; j++) {
+        if (
+            host === domainList[j] ||
+            shExpMatch(host, "*." + domainList[j])
+        ) {
+            return "DIRECT";
+        }
+    }
+
+    /*
+     * Intentionally no final "return BLOCK".
+     *
+     * Targets that do not match a custom rule must fall back to
+     * the ZIA DR Pre-Selected Destinations allowlist/policy.
+     */
+}
