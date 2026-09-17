@@ -87,7 +87,8 @@ function FindProxyForURL(url, host) {
         "liveupdate.symantec.com",
         "shasta-clt.symantec.com",
         "updates2.cdc.carbonblack.io",
-        "bbc.com"
+        "bbc.com",
+        "hp.com"
     ];
 
     for (var k = 0; k < blockDomainList.length; k++) {
@@ -95,7 +96,7 @@ function FindProxyForURL(url, host) {
             host === blockDomainList[k] ||
             shExpMatch(host, "*." + blockDomainList[k])
         ) {
-            return "BLOCK";
+            return drop;
         }
     }
 
