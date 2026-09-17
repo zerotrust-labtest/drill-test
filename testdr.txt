@@ -38,7 +38,22 @@ function FindProxyForURL(url, host) {
      * DR block list
      * Do NOT append "; DIRECT".
      */
+    var drop = "BLOCK";
+    var blockDomainList = [
+	"ent-shasta-rrs.symantec.com",
+	"liveupdate.symantec.com",
+	"shasta-clt.symantec.com",
+	"updates2.cdc.carbonblack.io",
+	"bbc.com"
+    ];
 
+    /* Domain-level block: domain plus all subdomains */
+    for (k = 0; k < blockDomainList.length; k++) {
+        if (host === blockDomainList[k] ||
+            shExpMatch(host, "*." + blockDomainList[k])) {
+            return drop;
+        }
+    }
 
     /* Custom whitelist */
     var ipList = [
