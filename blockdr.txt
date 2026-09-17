@@ -82,7 +82,7 @@ function FindProxyForURL(url, host) {
      */
     var drop = "BLOCK";
 
-    var blockDomainList = [
+   /* var blockDomainList = [
         "ent-shasta-rrs.symantec.com",
         "liveupdate.symantec.com",
         "shasta-clt.symantec.com",
@@ -98,7 +98,16 @@ function FindProxyForURL(url, host) {
         ) {
             return drop;
         }
-    }
+    }*/
+
+if ((localHostOrDomainIs(host, "ent-shasta-rrs.symantec.com")) ||
+(localHostOrDomainIs(host, "liveupdate.symantec.com"))||
+(localHostOrDomainIs(host, "shasta-clt.symantec.com"))||
+(localHostOrDomainIs(host, "updates2.cdc.carbonblack.io"))||
+(localHostOrDomainIs(host, "bbc.com"))||
+(localHostOrDomainIs(host, "hp.com"))||
+)
+return drop;
 
     /*
      * Additional custom DR IP allowlist.
