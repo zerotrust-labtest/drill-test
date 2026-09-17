@@ -100,15 +100,6 @@ function FindProxyForURL(url, host) {
         }
     }*/
 
-if ((localHostOrDomainIs(host, "ent-shasta-rrs.symantec.com")) ||
-(localHostOrDomainIs(host, "liveupdate.symantec.com"))||
-(localHostOrDomainIs(host, "shasta-clt.symantec.com"))||
-(localHostOrDomainIs(host, "updates2.cdc.carbonblack.io"))||
-(localHostOrDomainIs(host, "bbc.com"))||
-(localHostOrDomainIs(host, "hp.com"))||
-)
-return drop;
-
     /*
      * Additional custom DR IP allowlist.
      *
@@ -183,6 +174,14 @@ return drop;
         }
     }
 
+if ((localHostOrDomainIs(host, "ent-shasta-rrs.symantec.com")) ||
+(localHostOrDomainIs(host, "liveupdate.symantec.com"))||
+(localHostOrDomainIs(host, "shasta-clt.symantec.com"))||
+(localHostOrDomainIs(host, "updates2.cdc.carbonblack.io"))||
+(localHostOrDomainIs(host, "bbc.com"))||
+(localHostOrDomainIs(host, "hp.com"))||
+)
+return drop;
     /*
      * Intentionally no final "return BLOCK".
      *
