@@ -39,17 +39,6 @@ function FindProxyForURL(url, host) {
      * Do NOT append "; DIRECT".
      */
 var drop = "BLOCK";
-
-var blockUrlList = [
-    "https://www.bbc.com/news/articles/cqx2zpj4y525o",
-];
-
-/* Specific URL/path block must be evaluated before DIRECT whitelist rules */
-for (var u = 0; u < blockUrlList.length; u++) {
-    if (shExpMatch(url, blockUrlList[u])) {
-        return drop;
-    }
-}
     var blockDomainList = [
         "google.com",
         "facebook.com",
@@ -65,7 +54,6 @@ for (var u = 0; u < blockUrlList.length; u++) {
             return drop;
         }
     }
-
 
     /* Custom whitelist */
     var ipList = [
