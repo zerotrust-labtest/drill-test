@@ -95,7 +95,7 @@ function FindProxyForURL(url, host) {
             host === blockDomainList[k] ||
             shExpMatch(host, "*." + blockDomainList[k])
         ) {
-            return drop;
+            return "BLOCK";
         }
     }
 
